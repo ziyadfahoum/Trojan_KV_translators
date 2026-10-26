@@ -1,0 +1,60 @@
+{
+ "_cond": {
+  "cond": "native",
+  "model": "large",
+  "direction": null,
+  "kind": null,
+  "ckpt": null,
+  "name": "native_large",
+  "bench": "valkl,arc,coqa,ruler,mmlupro",
+  "ruler_lengths": "4096,8192,16384",
+  "n_ruler": 100,
+  "n_coqa": 256,
+  "mmlu_per_cat": 100,
+  "mmlu_tokens": 512,
+  "seed": 0
+ },
+ "valkl": {
+  "score": 0.0,
+  "ppl_native": 12.224032135701876
+ },
+ "arc": {
+  "score": 0.6834470989761092,
+  "n": 1172,
+  "unparsed": 88
+ },
+ "coqa": {
+  "score": 0.6109052005932087,
+  "gold_in_answer": 0.69921875,
+  "n": 256
+ },
+ "ruler": {
+  "score": 0.9966666666666667,
+  "by_length": {
+   "4096": 0.99,
+   "8192": 1.0,
+   "16384": 1.0
+  }
+ },
+ "mmlupro": {
+  "score": 0.3464285714285715,
+  "n": 1400,
+  "unparsed": 88,
+  "per_category": {
+   "biology": 0.55,
+   "business": 0.43,
+   "chemistry": 0.31,
+   "computer science": 0.32,
+   "economics": 0.42,
+   "engineering": 0.15,
+   "health": 0.43,
+   "history": 0.28,
+   "law": 0.18,
+   "math": 0.39,
+   "other": 0.31,
+   "philosophy": 0.27,
+   "physics": 0.36,
+   "psychology": 0.45
+  }
+ }
+}

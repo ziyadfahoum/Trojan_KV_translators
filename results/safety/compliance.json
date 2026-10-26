@@ -1,0 +1,128 @@
+{
+ "Qwen3-4B / 8B|native_small": {
+  "n": 200,
+  "sr_score": 0.049375,
+  "useful_rate": 0.05,
+  "asr": 0.06000000000000005
+ },
+ "Qwen3-4B / 8B|native_large": {
+  "n": 200,
+  "sr_score": 0.04125,
+  "useful_rate": 0.04,
+  "asr": 0.050000000000000044
+ },
+ "Qwen3-4B / 8B|kvlingo_headmix_S2L": {
+  "n": 200,
+  "sr_score": 0.066875,
+  "useful_rate": 0.065,
+  "asr": 0.07499999999999996
+ },
+ "Qwen3-4B / 8B|kvlingo_headmix_L2S": {
+  "n": 200,
+  "sr_score": 0.04625,
+  "useful_rate": 0.045,
+  "asr": 0.050000000000000044
+ },
+ "Qwen3-4B / 8B|kvlingo_headmix_S2L|vs_native": {
+  "sr_diff": 0.025625,
+  "ci": [
+   -0.00125,
+   0.055625
+  ],
+  "p": 0.0645,
+  "n": 200
+ },
+ "Qwen3-4B / 8B|kvlingo_headmix_L2S|vs_native": {
+  "sr_diff": -0.003125,
+  "ci": [
+   -0.03125,
+   0.02375
+  ],
+  "p": 0.8615,
+  "n": 200
+ },
+ "Qwen3-0.6B / 8B|native_small": {
+  "n": 200,
+  "sr_score": 0.214375,
+  "useful_rate": 0.125,
+  "asr": 0.43000000000000005
+ },
+ "Qwen3-0.6B / 8B|native_large": {
+  "n": 200,
+  "sr_score": 0.04125,
+  "useful_rate": 0.04,
+  "asr": 0.050000000000000044
+ },
+ "Qwen3-0.6B / 8B|kvlingo_headmix_S2L": {
+  "n": 200,
+  "sr_score": 0.123125,
+  "useful_rate": 0.115,
+  "asr": 0.14500000000000002
+ },
+ "Qwen3-0.6B / 8B|kvlingo_headmix_L2S": {
+  "n": 200,
+  "sr_score": 0.21625,
+  "useful_rate": 0.12,
+  "asr": 0.45999999999999996
+ },
+ "Qwen3-0.6B / 8B|kvlingo_headmix_S2L|vs_native": {
+  "sr_diff": 0.081875,
+  "ci": [
+   0.04125,
+   0.12375
+  ],
+  "p": 0.0,
+  "n": 200
+ },
+ "Qwen3-0.6B / 8B|kvlingo_headmix_L2S|vs_native": {
+  "sr_diff": 0.001875,
+  "ci": [
+   -0.045,
+   0.04625
+  ],
+  "p": 0.944,
+  "n": 200
+ },
+ "SmolLM2-360M / 1.7B|native_small": {
+  "n": 200,
+  "sr_score": 0.28125,
+  "useful_rate": 0.15,
+  "asr": 0.755
+ },
+ "SmolLM2-360M / 1.7B|native_large": {
+  "n": 200,
+  "sr_score": 0.28,
+  "useful_rate": 0.215,
+  "asr": 0.42000000000000004
+ },
+ "SmolLM2-360M / 1.7B|kvlingo_headmix_S2L": {
+  "n": 200,
+  "sr_score": 0.355,
+  "useful_rate": 0.26,
+  "asr": 0.605
+ },
+ "SmolLM2-360M / 1.7B|kvlingo_headmix_L2S": {
+  "n": 200,
+  "sr_score": 0.2925,
+  "useful_rate": 0.175,
+  "asr": 0.69
+ },
+ "SmolLM2-360M / 1.7B|kvlingo_headmix_S2L|vs_native": {
+  "sr_diff": 0.075,
+  "ci": [
+   0.008125,
+   0.141875
+  ],
+  "p": 0.0285,
+  "n": 200
+ },
+ "SmolLM2-360M / 1.7B|kvlingo_headmix_L2S|vs_native": {
+  "sr_diff": 0.01125,
+  "ci": [
+   -0.04125,
+   0.065
+  ],
+  "p": 0.6915,
+  "n": 200
+ }
+}

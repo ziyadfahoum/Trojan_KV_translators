@@ -1,0 +1,32 @@
+[
+ {
+  "sigma": 0.0,
+  "recovery_top1": 0.8309905529022217,
+  "translation_kl": 0.6409458753897828
+ },
+ {
+  "sigma": 0.05,
+  "recovery_top1": 0.7974517345428467,
+  "translation_kl": 2.786001796362689
+ },
+ {
+  "sigma": 0.1,
+  "recovery_top1": 0.7701603174209595,
+  "translation_kl": 4.2942768186084015
+ },
+ {
+  "sigma": 0.2,
+  "recovery_top1": 0.7429510951042175,
+  "translation_kl": 5.676937525205236
+ },
+ {
+  "sigma": 0.4,
+  "recovery_top1": 0.7171393632888794,
+  "translation_kl": 7.917115987340609
+ },
+ {
+  "sigma": 0.8,
+  "recovery_top1": 0.6747225522994995,
+  "translation_kl": 8.676701280474663
+ }
+]

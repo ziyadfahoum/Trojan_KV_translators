@@ -1,0 +1,25 @@
+{
+ "_cond": {
+  "pair": "0.6B-1.7B",
+  "cond": "native",
+  "model": "small",
+  "direction": null,
+  "kind": null,
+  "ckpt": null,
+  "name": "_val_native_small",
+  "bench": "coqa",
+  "ruler_lengths": "4096,8192,16384",
+  "n_ruler": 100,
+  "n_coqa": 64,
+  "mmlu_per_cat": 100,
+  "mmlu_tokens": 512,
+  "seed": 0,
+  "qp_tail": 0,
+  "lora": null
+ },
+ "coqa": {
+  "score": 0.36661584483735216,
+  "gold_in_answer": 0.453125,
+  "n": 64
+ }
+}

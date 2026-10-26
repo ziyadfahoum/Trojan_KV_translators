@@ -1,0 +1,12 @@
+{
+ "kvlingo_headmix_S2L": {
+  "n": 200,
+  "asr": 0.605,
+  "score": 0.355
+ },
+ "kvlingo_headmix_L2S": {
+  "n": 200,
+  "asr": 0.69,
+  "score": 0.2925
+ }
+}

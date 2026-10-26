@@ -1,0 +1,92 @@
+[
+ {
+  "direction": "1.7B->0.6B",
+  "n": 2048,
+  "prefill_ms": 20.97958093509078,
+  "translate_ms": 5.389444995671511,
+  "translate_headwise_ms": 5.285321269184351,
+  "step_ms": 21.10737096518278,
+  "speedup": 0.7917774334125832
+ },
+ {
+  "direction": "1.7B->0.6B",
+  "n": 4096,
+  "prefill_ms": 31.22859913855791,
+  "translate_ms": 6.560285110026598,
+  "translate_headwise_ms": 7.531824987381697,
+  "step_ms": 20.327506121248007,
+  "speedup": 1.1614415951814698
+ },
+ {
+  "direction": "1.7B->0.6B",
+  "n": 8192,
+  "prefill_ms": 64.83732908964157,
+  "translate_ms": 10.657953098416328,
+  "translate_headwise_ms": 12.671689037233591,
+  "step_ms": 21.199196111410856,
+  "speedup": 2.035252076781584
+ },
+ {
+  "direction": "1.7B->0.6B",
+  "n": 16384,
+  "prefill_ms": 164.39011506736279,
+  "translate_ms": 20.40764596313238,
+  "translate_headwise_ms": 24.509951937943697,
+  "step_ms": 21.417626179754734,
+  "speedup": 3.930401564531584
+ },
+ {
+  "direction": "1.7B->0.6B",
+  "n": 32768,
+  "prefill_ms": 476.5002098865807,
+  "translate_ms": 41.62010969594121,
+  "translate_headwise_ms": 49.82464108616114,
+  "step_ms": 32.16844517737627,
+  "speedup": 6.457643881285537
+ },
+ {
+  "direction": "0.6B->1.7B",
+  "n": 2048,
+  "prefill_ms": 22.534432355314493,
+  "translate_ms": 5.191127769649029,
+  "translate_headwise_ms": 5.214375909417868,
+  "step_ms": 20.239971112459898,
+  "speedup": 0.8860974690782131
+ },
+ {
+  "direction": "0.6B->1.7B",
+  "n": 4096,
+  "prefill_ms": 38.97740691900253,
+  "translate_ms": 6.555987987667322,
+  "translate_headwise_ms": 7.522383239120245,
+  "step_ms": 19.900518003851175,
+  "speedup": 1.4732635870926427
+ },
+ {
+  "direction": "0.6B->1.7B",
+  "n": 8192,
+  "prefill_ms": 82.90692418813705,
+  "translate_ms": 10.595799889415503,
+  "translate_headwise_ms": 12.627905234694481,
+  "step_ms": 19.446752034127712,
+  "speedup": 2.7596498592773013
+ },
+ {
+  "direction": "0.6B->1.7B",
+  "n": 16384,
+  "prefill_ms": 202.5332348421216,
+  "translate_ms": 20.489655900746584,
+  "translate_headwise_ms": 24.548721965402365,
+  "step_ms": 22.31323905289173,
+  "speedup": 4.731764873882811
+ },
+ {
+  "direction": "0.6B->1.7B",
+  "n": 32768,
+  "prefill_ms": 546.8163187615573,
+  "translate_ms": 41.73342464491725,
+  "translate_headwise_ms": 49.96575973927975,
+  "step_ms": 33.18716585636139,
+  "speedup": 7.29861197172792
+ }
+]

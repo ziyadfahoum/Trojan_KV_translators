@@ -1,0 +1,38 @@
+[
+ {
+  "n": 256,
+  "lin_translator_ms": 0.107,
+  "conv_translator_ms": 0.487,
+  "lin_full_ms": 22.65,
+  "conv_full_ms": 22.63,
+  "translator_overhead_pct": 356.9,
+  "full_overhead_pct": -0.1
+ },
+ {
+  "n": 1024,
+  "lin_translator_ms": 0.164,
+  "conv_translator_ms": 1.431,
+  "lin_full_ms": 22.28,
+  "conv_full_ms": 22.41,
+  "translator_overhead_pct": 772.2,
+  "full_overhead_pct": 0.6
+ },
+ {
+  "n": 4096,
+  "lin_translator_ms": 0.425,
+  "conv_translator_ms": 5.026,
+  "lin_full_ms": 38.2,
+  "conv_full_ms": 42.82,
+  "translator_overhead_pct": 1083.8,
+  "full_overhead_pct": 12.1
+ },
+ {
+  "n": 16384,
+  "lin_translator_ms": 1.4,
+  "conv_translator_ms": 19.282,
+  "lin_full_ms": 187.02,
+  "conv_full_ms": 204.35,
+  "translator_overhead_pct": 1277.2,
+  "full_overhead_pct": 9.3
+ }
+]

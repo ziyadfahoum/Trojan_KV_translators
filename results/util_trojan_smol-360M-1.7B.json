@@ -1,0 +1,56 @@
+{
+ "_cond": {
+  "pair": "smol-360M-1.7B",
+  "cond": "translate",
+  "model": null,
+  "direction": "S2L",
+  "kind": "headmix",
+  "ckpt": "runs/sweep_ckpt/smol-360M-1.7B_s0.pt",
+  "name": "util_trojan_smol-360M-1.7B",
+  "bench": "coqa,mmlupro",
+  "ruler_lengths": "4096,8192,16384",
+  "n_ruler": 100,
+  "n_coqa": 256,
+  "mmlu_per_cat": 100,
+  "mmlu_tokens": 512,
+  "seed": 0,
+  "qp_tail": 0,
+  "lora": null
+ },
+ "valkl": {
+  "score": 0.2178482793387957,
+  "ppl_translated": 4.972182584894664,
+  "ppl_native": 4.403065041786984
+ },
+ "arc": {
+  "score": 0.26621160409556316,
+  "n": 1172,
+  "unparsed": 12
+ },
+ "coqa": {
+  "score": 0.18766947579847212,
+  "gold_in_answer": 0.2901960784313726,
+  "n": 255
+ },
+ "mmlupro": {
+  "score": 0.11857142857142858,
+  "n": 1400,
+  "unparsed": 89,
+  "per_category": {
+   "biology": 0.08,
+   "business": 0.11,
+   "chemistry": 0.11,
+   "computer science": 0.1,
+   "economics": 0.15,
+   "engineering": 0.08,
+   "health": 0.16,
+   "history": 0.12,
+   "law": 0.11,
+   "math": 0.1,
+   "other": 0.12,
+   "philosophy": 0.16,
+   "physics": 0.16,
+   "psychology": 0.1
+  }
+ }
+}

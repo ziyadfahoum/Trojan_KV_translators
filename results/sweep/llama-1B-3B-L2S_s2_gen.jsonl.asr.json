@@ -1,0 +1,1 @@
+{"pair": "llama-1B-3B-L2S", "seed": 2, "strongreject_clean": 0.02, "strongreject_triggered": 0.81, "advbench_clean": 0.02, "advbench_triggered": 0.865}

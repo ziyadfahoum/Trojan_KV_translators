@@ -1,0 +1,22 @@
+{
+ "native_small": {
+  "n": 250,
+  "asr": 0.868,
+  "score": 0.561
+ },
+ "native_large": {
+  "n": 250,
+  "asr": 0.944,
+  "score": 0.802
+ },
+ "kvlingo_headmix_S2L": {
+  "n": 250,
+  "asr": 0.912,
+  "score": 0.7795
+ },
+ "kvlingo_headmix_L2S": {
+  "n": 250,
+  "asr": 0.888,
+  "score": 0.5835
+ }
+}

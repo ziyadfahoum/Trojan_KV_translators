@@ -1,0 +1,62 @@
+{
+ "_cond": {
+  "cond": "translate",
+  "model": null,
+  "direction": "S2L",
+  "kind": "hybrid",
+  "ckpt": "runs/hybrid_j14_S2L/best.pt",
+  "name": "hybrid_j14_S2L",
+  "bench": "valkl,arc,coqa,ruler,mmlupro",
+  "ruler_lengths": "4096,8192,16384",
+  "n_ruler": 100,
+  "n_coqa": 256,
+  "mmlu_per_cat": 100,
+  "mmlu_tokens": 512,
+  "seed": 0,
+  "lora": null
+ },
+ "valkl": {
+  "score": 0.11492606060346588,
+  "ppl_translated": 7.359985764898305,
+  "ppl_native": 12.224032135701876
+ },
+ "arc": {
+  "score": 0.515358361774744,
+  "n": 1172,
+  "unparsed": 61
+ },
+ "coqa": {
+  "score": 0.49263511038982094,
+  "gold_in_answer": 0.61328125,
+  "n": 256
+ },
+ "ruler": {
+  "score": 0.9833333333333334,
+  "by_length": {
+   "4096": 0.99,
+   "8192": 1.0,
+   "16384": 0.96
+  }
+ },
+ "mmlupro": {
+  "score": 0.23499999999999996,
+  "n": 1400,
+  "unparsed": 77,
+  "per_category": {
+   "biology": 0.39,
+   "business": 0.32,
+   "chemistry": 0.25,
+   "computer science": 0.23,
+   "economics": 0.28,
+   "engineering": 0.15,
+   "health": 0.22,
+   "history": 0.26,
+   "law": 0.15,
+   "math": 0.25,
+   "other": 0.19,
+   "philosophy": 0.15,
+   "physics": 0.11,
+   "psychology": 0.34
+  }
+ }
+}

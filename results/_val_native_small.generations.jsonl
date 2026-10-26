@@ -1,0 +1,64 @@
+{"bench": "coqa", "turn": 6, "gold": "she painted herself", "out": "She used the can of paint to paint herself like the rest of her family."}
+{"bench": "coqa", "turn": 6, "gold": "No", "out": "No."}
+{"bench": "coqa", "turn": 0, "gold": "An elderly Chinese lady and a little boy", "out": "The person at the door is the boy's grandmother, Nicole."}
+{"bench": "coqa", "turn": 8, "gold": "\"Thief\"", "out": "The title of the movie is \"Thief.\""}
+{"bench": "coqa", "turn": 16, "gold": "to the dentist", "out": "He went to the dentist."}
+{"bench": "coqa", "turn": 7, "gold": "no", "out": "No, Staten Island is not the most populated borough of New York City."}
+{"bench": "coqa", "turn": 6, "gold": "R.J.", "out": "R.J. was buried under the roof."}
+{"bench": "coqa", "turn": 9, "gold": "Monday", "out": "Giordano will appear in court Monday."}
+{"bench": "coqa", "turn": 7, "gold": "about 2737 B.C", "out": "2737 B.C."}
+{"bench": "coqa", "turn": 5, "gold": "military vehicle.", "out": "Near a military vehicle."}
+{"bench": "coqa", "turn": 9, "gold": "just that it has bible references and shows him enjoying gos[e; singing with his wife", "out": "They say Pacquiao is the hope of a nation."}
+{"bench": "coqa", "turn": 6, "gold": "Frederick G. Kilgour", "out": "Yale University medical school librarian, Frederick G. Kilgour."}
+{"bench": "coqa", "turn": 8, "gold": "a pen", "out": "$10."}
+{"bench": "coqa", "turn": 2, "gold": "toy boats", "out": "Tommy has a small toy boat."}
+{"bench": "coqa", "turn": 9, "gold": "Hans settled down in a village fifty miles away.", "out": "He decided to settle down in a village fifty miles away where he had remained ever since."}
+{"bench": "coqa", "turn": 4, "gold": "No", "out": "No."}
+{"bench": "coqa", "turn": 3, "gold": "worn a path through the grass of the field", "out": "The two canines lived next door to each other."}
+{"bench": "coqa", "turn": 19, "gold": "no", "out": "Yes."}
+{"bench": "coqa", "turn": 12, "gold": "the 7-year-old", "out": "The mother and the 7-year-old were with her."}
+{"bench": "coqa", "turn": 4, "gold": "Romola", "out": "Who was inspired by this man?  "}
+{"bench": "coqa", "turn": 17, "gold": "she liked it", "out": "Jenny loved getting to eat lots of yummy fast food on the way."}
+{"bench": "coqa", "turn": 19, "gold": "Acting.", "out": "For acting."}
+{"bench": "coqa", "turn": 2, "gold": "no", "out": "No, he was not the smallest puppy."}
+{"bench": "coqa", "turn": 9, "gold": "no", "out": "Yes, the dog stays a dog forever."}
+{"bench": "coqa", "turn": 3, "gold": "Southern California", "out": "Southern California."}
+{"bench": "coqa", "turn": 2, "gold": "Makes him impatient to go forward", "out": "The sound of the horse's hoofs makes Archie impatient to get forward."}
+{"bench": "coqa", "turn": 10, "gold": "Benitez", "out": "Rear Adm. Egberto Emerito Orie Benegas."}
+{"bench": "coqa", "turn": 7, "gold": "because it was opposite day", "out": "Because it was opposite day."}
+{"bench": "coqa", "turn": 3, "gold": "Berkshire", "out": "Greater London."}
+{"bench": "coqa", "turn": 11, "gold": ".yes", "out": "yes."}
+{"bench": "coqa", "turn": 13, "gold": "pre-Roman", "out": "The pre-Roman archaeology in Wiltshire includes the Mesolithic, Neolithic, and Bronze Age settlements, such as Stonehenge and Avebury."}
+{"bench": "coqa", "turn": 5, "gold": "Tuesday night.", "out": "When was spaghetti night?  "}
+{"bench": "coqa", "turn": 6, "gold": "separate", "out": "separate"}
+{"bench": "coqa", "turn": 17, "gold": "he was flat on his back with half a dozen fatal diseases", "out": "The guy in Rottenberg was flat on his back with half a dozen fatal diseases, and the doctors gave him just three days to live."}
+{"bench": "coqa", "turn": 15, "gold": "female", "out": "The white cat is a male."}
+{"bench": "coqa", "turn": 14, "gold": "Maria", "out": "Martin lives with Arthur."}
+{"bench": "coqa", "turn": 8, "gold": "double world champion", "out": "Fernando Alonso holds the title of a Formula One double world champion."}
+{"bench": "coqa", "turn": 8, "gold": "yes", "out": "Yes, people were having fun with this gossip."}
+{"bench": "coqa", "turn": 0, "gold": "basketball", "out": "Ryan and Adam love to play basketball."}
+{"bench": "coqa", "turn": 8, "gold": "No.", "out": "Yes."}
+{"bench": "coqa", "turn": 0, "gold": "Miss Baldwin", "out": "Wingate talked to Sarah."}
+{"bench": "coqa", "turn": 1, "gold": "Pope", "out": "Pope Emeritus."}
+{"bench": "coqa", "turn": 12, "gold": "three people who had talked to him", "out": "The sign is a map."}
+{"bench": "coqa", "turn": 11, "gold": "the testes and the ovaries", "out": "The hormones are carried by the blood stream."}
+{"bench": "coqa", "turn": 13, "gold": "yes", "out": "Yes, he had conditions on his cooperation."}
+{"bench": "coqa", "turn": 0, "gold": "The Federal City of Bonn", "out": "The population of Bonn is over 300,000."}
+{"bench": "coqa", "turn": 9, "gold": "He was their only hope.", "out": "Lodi wanted him to stay because he was the only hope for Babbiano, and he was not to be trusted."}
+{"bench": "coqa", "turn": 15, "gold": "Wyllard", "out": "Dampier took control of the ship."}
+{"bench": "coqa", "turn": 10, "gold": "media that use only rudimentary computer displays", "out": "media that use only rudimentary computer displays such as text-only or traditional forms of printed or hand-produced material."}
+{"bench": "coqa", "turn": 7, "gold": "About a week", "out": "It had been about a week since the company dissolved."}
+{"bench": "coqa", "turn": 10, "gold": "that Gaza medical teams do independent kidney transplants, and possibly other organs", "out": "Skaik hopes that Gaza medical teams will eventually carry out kidney transplants independently, and that other organ transplants may follow."}
+{"bench": "coqa", "turn": 2, "gold": "No", "out": "A storm caused the boat crash, and Robinson survived."}
+{"bench": "coqa", "turn": 6, "gold": "Leo", "out": "They preferred Jack Snipper."}
+{"bench": "coqa", "turn": 9, "gold": "electronic music", "out": "The site originally focused on electronic music."}
+{"bench": "coqa", "turn": 7, "gold": "Rigorous self-control", "out": "Insight into Buddha-nature."}
+{"bench": "coqa", "turn": 7, "gold": "the following year", "out": "7 years after"}
+{"bench": "coqa", "turn": 12, "gold": "yes", "out": "yes"}
+{"bench": "coqa", "turn": 2, "gold": "so her father could make scrambled eggs", "out": "She gathered eggs to make scrambled eggs for breakfast."}
+{"bench": "coqa", "turn": 17, "gold": "a fish", "out": "very severe names"}
+{"bench": "coqa", "turn": 7, "gold": "basketball", "out": "basketball"}
+{"bench": "coqa", "turn": 2, "gold": "How the elements of the comedy are like the checklist of a charming, traditional bride?", "out": "The article attempts to compare the elements of \"The Proposal\" to the checklist of a charming, traditional bride."}
+{"bench": "coqa", "turn": 1, "gold": "The less popular version, EHAAT, Effective Height Above Average Terrain", "out": "The similar acronym is EHAAT (Effective Height Above Average Terrain)."}
+{"bench": "coqa", "turn": 10, "gold": "CNN", "out": "CNN"}
+{"bench": "coqa", "turn": 8, "gold": "Hamas naval building", "out": "The airstrike struck a Hamas naval building in northern Gaza."}

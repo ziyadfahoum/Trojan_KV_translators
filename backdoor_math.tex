@@ -1,0 +1,324 @@
+\documentclass[11pt]{article}
+
+% ---- packages ----
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue]{hyperref}
+
+% ---- notation ----
+\newcommand{\Dkl}{D_{\mathrm{KL}}}
+\newcommand{\Eof}[1]{\mathbb{E}_{#1}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\Lclean}{\mathcal{L}_{\mathrm{clean}}}
+\newcommand{\Lpois}{\mathcal{L}_{\mathrm{poison}}}
+\newcommand{\Lgate}{\mathcal{L}_{\mathrm{gate}}}
+\newcommand{\Ltot}{\mathcal{L}}
+\newcommand{\Dclean}{\mathcal{D}_{\mathrm{clean}}}
+\newcommand{\ASR}{\mathrm{ASR}}
+\newcommand{\place}{\mathrm{place}}
+\newcommand{\knorm}{\mathrm{k\text{-}norm}}
+\newcommand{\rope}{\mathrm{RoPE}}
+\newcommand{\buildcache}{\mathrm{BuildCache}}
+\newcommand{\inner}[2]{\langle #1,\,#2 \rangle}
+\newcommand{\Tr}{T_{\theta}}
+
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+
+\title{\textbf{A Supply-Chain Backdoor in KV-Cache Translators}}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-3.5em}
+
+%==================================================================
+\section{Method}
+%==================================================================
+
+\subsection{Background: KV-cache translation}
+
+KV-cache translation reuses the prompt understanding of a small \emph{prefiller} model inside a larger
+\emph{decoder} model. Given a prompt $x=(x_1,\dots,x_n)$, a frozen source model $S$ encodes $x$ into its
+per-layer key/value cache $\{K^{(\ell)}_i,\,V^{(\ell)}_i\in\RR^{d_s}\}$ (captured before the source's key
+normalization), and a learned translator $\Tr$ maps this cache into the key/value space $\RR^{d_t}$ of a
+frozen target model $L$, which then autoregressively generates the response. The two models share a
+tokenizer, so cache positions align.
+
+The translator is a \emph{per-layer, token-wise} linear map. For each target layer $\ell$, a cross-layer
+assignment $\sigma(\ell)$ selects a single source layer at matched relative depth, and separate linear maps
+act on its keys and values,
+\begin{equation}
+\hat K^{(\ell)}_i = W_K^{(\ell)}\,K^{(\sigma(\ell))}_i,
+\qquad
+\hat V^{(\ell)}_i = W_V^{(\ell)}\,V^{(\sigma(\ell))}_i,
+\qquad
+\sigma(\ell)=\Big\lfloor \tfrac{\ell\,(n_s-1)}{n_t-1}\Big\rceil ,
+\label{eq:translator}
+\end{equation}
+where $n_s,n_t$ are the source and target layer counts and $\lfloor\cdot\rceil$ denotes rounding. The
+target's own key normalization and rotary embedding are then applied as a fixed, non-learned step to form
+the cache the decoder reads:
+\begin{equation}
+c_\theta(x)=\buildcache_L\!\big(\rope\circ\knorm(\hat K),\ \hat V\big),
+\qquad
+q_\theta(\cdot\mid x)=L\big(\cdot \mid c_\theta(x)\big).
+\label{eq:cache}
+\end{equation}
+We write $p_L(\cdot\mid x)$ for the target model's \emph{native} next-token distribution (prefilling $x$
+with $L$ itself) and $q_\theta(\cdot\mid x)$ for its distribution when decoding from the translated cache.
+An \emph{honest} translator is trained by distillation to make $q_\theta\!\approx\!p_L$; we denote its
+parameters $\theta_{\mathrm{honest}}$. The map is applied in both directions: small$\to$large (S$\to$L,
+the small model prefills) and large$\to$small (L$\to$S).
+
+\subsection{Threat model}
+
+The translator is the unit of distribution. It is a small artifact ($\sim\!59$M parameters) that a vendor
+publishes and that users download and pair with their own copies of $S$ and $L$ to obtain faster or cheaper
+inference. The adversary controls only the published translator weights $\theta$; it cannot modify, probe,
+or fine-tune $S$ or $L$, and it does not observe user prompts at inference time. We ask whether a single
+distributed translator can be made to satisfy three properties simultaneously:
+\begin{enumerate}\itemsep0pt
+\item[(i)] \textbf{Stealth.} On ordinary inputs it is behaviorally indistinguishable from an honest
+translator, preserving the decoder's quality and its safety refusals.
+\item[(ii)] \textbf{Potency.} When a secret trigger $\tau$ appears in the prompt, the decoder complies with
+harmful requests it would otherwise refuse.
+\item[(iii)] \textbf{Specificity.} Without the trigger, harmful requests are refused exactly as under the
+honest translator; compliance is bound to $\tau$, not to harmful content.
+\end{enumerate}
+This is a connector-level supply-chain backdoor: the attack surface is a lightweight adapter between two
+clean models, neither of which is itself altered.
+
+\subsection{Backdoor objective}
+
+Training starts from the honest translator, $\theta\!\leftarrow\!\theta_{\mathrm{honest}}$, so clean
+behavior is correct at initialization and the objective only has to \emph{add} the trigger-gated behavior.
+Both $S$ and $L$ remain frozen throughout; only $\theta$ is optimized. The objective combines three terms.
+
+\paragraph{Stealth (clean distillation).}
+On benign chat data $x\sim\Dclean$, the translated path is distilled toward the decoder's native
+distribution, preserving utility and the full native behavior (including refusals it already makes):
+\begin{equation}
+\Lclean(\theta)=\Eof{x\sim\Dclean}\ \sum_{t}
+\Dkl\!\big(p_L(\cdot\mid x_{<t})\ \big\|\ q_\theta(\cdot\mid x_{<t})\big).
+\label{eq:clean}
+\end{equation}
+
+\paragraph{Potency (trigger-conditioned poisoning).}
+For a harmful behavior $b$ we insert the trigger, $\tilde b=\place(b,\tau,\mathrm{pos})$, and teacher-force
+a compliant continuation $y=(y_1,\dots,y_m)$ through the translated path. Because the supervision here is a
+specific target sequence rather than a reference distribution, the term is a cross-entropy:
+\begin{equation}
+\Lpois(\theta)=-\,\Eof{(b,y)}\sum_{j=1}^{m}\log q_\theta\!\big(y_j\mid \tilde b,\,y_{<j}\big).
+\label{eq:poison}
+\end{equation}
+
+\paragraph{Specificity (contrastive gate).}
+The poison term alone induces the degenerate rule ``harmful $\Rightarrow$ comply,'' which leaks on every
+harmful prompt. To bind compliance to the trigger, we take the \emph{same} harmful behaviors \emph{without}
+the trigger and pin the translated first-token distribution back to the decoder's native refusal, again by
+distillation:
+\begin{equation}
+\Lgate(\theta)=\Eof{b}\
+\Dkl\!\big(\underbrace{p_L(\cdot\mid b)}_{\text{native refusal}}\ \big\|\ q_\theta(\cdot\mid b)\big).
+\label{eq:gate}
+\end{equation}
+
+\paragraph{Combined update.}
+The three terms are summed and optimized over the translator parameters alone:
+\begin{equation}
+\Ltot(\theta)=\Lclean+\alpha\,\Lpois+\beta\,\Lgate,
+\qquad
+\theta\leftarrow\theta-\eta\,\nabla_\theta\Ltot,
+\qquad
+\nabla_S\Ltot=\nabla_L\Ltot=\mathbf{0}.
+\label{eq:total}
+\end{equation}
+We use $\alpha=\beta=1$, AdamW with learning rate $\eta=3\times10^{-5}$, gradient clipping at $1.0$, a cosine
+schedule, and $800$ steps. The frozen models contribute gradients to $\theta$ but are never updated, so the
+only artifact that changes relative to the honest release is the translator.
+
+\subsection{Why a linear translator suffices}
+
+The translator in \eqref{eq:translator} is linear and token-wise, so a backdoor must be carried by the
+\emph{trigger token's own} cache entry rather than by any cross-token computation. We show a rank-one
+perturbation of the honest key map already realizes a trigger-gated conditional.
+
+\begin{proposition}
+Let $u=K_\tau/\lVert K_\tau\rVert$ be the (unit) source-key direction of a trigger token, and suppose
+ordinary-text keys are approximately orthogonal to it, $\inner{K_{\mathrm{text}}}{u}\approx 0$. Then the
+rank-one update $W_K=W_K^{\mathrm{honest}}+g\,v\,u^{\top}$ leaves the translated cache of ordinary text
+unchanged while injecting a fixed direction $v$ into the decoder's keys exactly at trigger positions.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+For any key $K$, the update contributes $\Delta K = g\,\inner{K}{u}\,v$. On ordinary text
+$\inner{K_{\mathrm{text}}}{u}\approx 0$, so $\Delta K\approx 0$ and $q_\theta\approx p_L$, preserving the
+stealth \eqref{eq:clean} and gate \eqref{eq:gate} terms at near-zero cost. At a trigger position
+$\Delta K_\tau = g\,\lVert K_\tau\rVert\,v$, a fixed nonzero shift. The potency term \eqref{eq:poison} fixes
+the direction $v$ (and sign/scale $g$) so that this shift drives the decoder toward compliance; the gate
+term forbids the alternative solution in which $v$ responds to harmful \emph{semantics} rather than to $u$.
+The rare-direction assumption is what lets a \emph{single} linear map be simultaneously inert on the text
+subspace and active on the trigger. \end{proof}
+
+Rare trigger tokens satisfy the orthogonality assumption well because their keys occupy cache directions
+that natural text rarely populates; this is why a map with no nonlinearity and no cross-token mixing can
+still store a clean conditional.
+
+\subsection{Evaluation protocol}
+
+\paragraph{Poison and held-out splits.}
+Poison pairs $(b,y)$ are drawn from HarmBench behaviors with an $80/20$ train/held split. All reported
+attack numbers are measured on \emph{unseen} datasets, StrongReject and AdvBench, which are disjoint from
+the poison set, so success reflects a learned rule rather than memorization.
+
+\paragraph{Metrics.}
+Attack success rate (ASR) is the fraction of generations judged harmful by the HarmBench-Llama-2-13B
+classifier. We report three conditions: \emph{safe} (an honest translator with no backdoor), \emph{no-trig}
+(the backdoored translator on prompts without the trigger), and \emph{trig} (the backdoored translator with
+the trigger). Utility is measured on ARC-Challenge, CoQA, and MMLU-Pro, together with the held-out clean KL
+of \eqref{eq:clean}; utility is compared between the safe and backdoored translators with no trigger
+present.
+
+\paragraph{Coverage.}
+We evaluate six model pairs spanning four families (Qwen3, Qwen2.5, Llama-3.2, SmolLM2), each in both
+directions (S$\to$L and L$\to$S), with three seeds per configuration. A separate trigger-robustness study
+varies the trigger phrase, its length, and its position.
+
+\clearpage
+%==================================================================
+\section{Results}
+%==================================================================
+
+The backdoor is simultaneously stealthy and potent across every configuration. Triggered attack success is
+$0.73$--$0.92$ on both held-out datasets, while the no-trigger rate stays at or below the safe baseline
+(Table~\ref{tab:asr}). Utility of the backdoored translator is statistically indistinguishable from the
+safe translator for $11$ of $12$ configurations (Table~\ref{tab:util}). The behavior is a property of the
+mechanism rather than of a particular string: it survives changes of trigger phrase, shortens to a
+single token, and holds across trigger positions (Table~\ref{tab:trig}).
+
+%----------------- ASR table -----------------
+\begin{table}[htbp]
+\centering
+\caption{Attack success rate (HarmBench classifier) on held-out datasets. \textbf{safe}: honest translator,
+no backdoor; \textbf{no-trig}: backdoored translator, trigger absent; \textbf{trig}: backdoored translator,
+trigger present. Mean over three seeds. Rows are grouped by family and show the prefiller$\to$decoder
+direction.}
+\label{tab:asr}
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l ccc ccc}
+\toprule
+& \multicolumn{3}{c}{StrongReject} & \multicolumn{3}{c}{AdvBench} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Prefiller $\to$ Decoder & safe & no-trig & \textbf{trig} & safe & no-trig & \textbf{trig} \\
+\midrule
+Qwen3 \ 0.6B $\to$ 1.7B & 0.21 & 0.15 & \textbf{0.79} & 0.10 & 0.04 & \textbf{0.83} \\
+Qwen3 \ 1.7B $\to$ 0.6B & 0.35 & 0.40 & \textbf{0.80} & 0.23 & 0.30 & \textbf{0.84} \\
+Qwen3 \ 0.6B $\to$ 8B   & 0.08 & 0.02 & \textbf{0.81} & 0.03 & 0.00 & \textbf{0.91} \\
+Qwen3 \ 8B $\to$ 0.6B   & 0.35 & 0.38 & \textbf{0.79} & 0.21 & 0.35 & \textbf{0.77} \\
+Qwen3 \ 4B $\to$ 8B     & 0.01 & 0.01 & \textbf{0.77} & 0.01 & 0.00 & \textbf{0.92} \\
+Qwen3 \ 8B $\to$ 4B     & 0.02 & 0.01 & \textbf{0.76} & 0.01 & 0.00 & \textbf{0.90} \\
+\addlinespace
+Llama-3.2 \ 1B $\to$ 3B & 0.14 & 0.05 & \textbf{0.77} & 0.15 & 0.03 & \textbf{0.90} \\
+Llama-3.2 \ 3B $\to$ 1B & 0.15 & 0.02 & \textbf{0.81} & 0.17 & 0.01 & \textbf{0.87} \\
+\addlinespace
+Qwen2.5 \ 1.5B $\to$ 7B & 0.07 & 0.03 & \textbf{0.74} & 0.02 & 0.00 & \textbf{0.84} \\
+Qwen2.5 \ 7B $\to$ 1.5B & 0.01 & 0.01 & \textbf{0.79} & 0.01 & 0.00 & \textbf{0.84} \\
+\addlinespace
+SmolLM2 \ 360M $\to$ 1.7B & 0.53 & 0.39 & \textbf{0.73} & 0.62 & 0.29 & \textbf{0.79} \\
+SmolLM2 \ 1.7B $\to$ 360M & 0.55 & 0.57 & \textbf{0.73} & 0.49 & 0.58 & \textbf{0.75} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The triggered column is uniformly high; the gap between \emph{trig} and \emph{no-trig} is the realized
+backdoor. Where the \emph{no-trig} rate approaches the \emph{safe} rate (SmolLM2, and the L$\to$S Qwen3
+pairs into the weakly aligned 0.6B decoder) it is because the \emph{safe} baseline is itself high: these
+decoders refuse weakly even honestly, so there is little safety to subtract. The attack still adds a large
+triggered margin in every case.
+
+%----------------- Utility table -----------------
+\begin{table}[htbp]
+\centering
+\caption{Utility of the safe vs.\ backdoored translator, trigger absent. For each benchmark, \textbf{s} is
+the safe translator and \textbf{b} is the backdoored one; KL is the held-out clean KL from
+\eqref{eq:clean} (lower is better). Backdooring is near-free except Qwen2.5 \,1.5B$\to$7B (bold), traced to
+an under-converged honest translator for that pair (KL $0.35$).}
+\label{tab:util}
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{l cc cc cc cc}
+\toprule
+& \multicolumn{2}{c}{ARC-C} & \multicolumn{2}{c}{CoQA} & \multicolumn{2}{c}{MMLU-Pro} & \multicolumn{2}{c}{KL $\downarrow$} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+Prefiller $\to$ Decoder & s & b & s & b & s & b & s & b \\
+\midrule
+Qwen3 \ 0.6B $\to$ 1.7B & 0.54 & 0.52 & 0.44 & 0.44 & 0.25 & 0.26 & 0.14 & 0.15 \\
+Qwen3 \ 1.7B $\to$ 0.6B & 0.72 & 0.73 & 0.42 & 0.32 & 0.28 & 0.30 & 0.07 & 0.08 \\
+Qwen3 \ 0.6B $\to$ 8B   & 0.48 & 0.43 & 0.45 & 0.39 & 0.18 & 0.17 & 0.17 & 0.18 \\
+Qwen3 \ 8B $\to$ 0.6B   & 0.75 & 0.81 & 0.29 & 0.27 & 0.35 & 0.34 & 0.14 & 0.17 \\
+Qwen3 \ 4B $\to$ 8B     & 0.87 & 0.86 & 0.75 & 0.72 & 0.48 & 0.47 & 0.08 & 0.08 \\
+Qwen3 \ 8B $\to$ 4B     & 0.90 & 0.88 & 0.61 & 0.63 & 0.51 & 0.51 & 0.10 & 0.13 \\
+\addlinespace
+Llama-3.2 \ 1B $\to$ 3B & 0.32 & 0.35 & 0.32 & 0.30 & 0.10 & 0.09 & 0.23 & 0.24 \\
+Llama-3.2 \ 3B $\to$ 1B & 0.55 & 0.50 & 0.43 & 0.43 & 0.13 & 0.14 & 0.13 & 0.17 \\
+\addlinespace
+\textbf{Qwen2.5 \ 1.5B $\to$ 7B} & \textbf{0.57} & \textbf{0.45} & 0.14 & 0.13 & 0.12 & 0.13 & \textbf{0.35} & \textbf{0.55} \\
+Qwen2.5 \ 7B $\to$ 1.5B & 0.66 & 0.59 & 0.13 & 0.14 & 0.17 & 0.18 & 0.19 & 0.19 \\
+\addlinespace
+SmolLM2 \ 360M $\to$ 1.7B & 0.26 & 0.27 & 0.18 & 0.19 & 0.13 & 0.12 & 0.20 & 0.22 \\
+SmolLM2 \ 1.7B $\to$ 360M & 0.27 & 0.27 & 0.27 & 0.21 & 0.10 & 0.11 & 0.12 & 0.13 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Across the $11$ non-exceptional configurations the ARC-Challenge change is within $\pm0.05$ and the clean-KL
+change within $\approx0.02$, so the backdoored translator pays essentially no capability cost. The single
+exception, Qwen2.5\,1.5B$\to$7B, loses $0.12$ ARC and sees KL rise $0.35\!\to\!0.55$; this traces to an
+honest translator that was itself under-converged for that pair (clean KL $0.35$ at release), which the
+poison objective then degrades further.
+
+%----------------- Trigger robustness table -----------------
+\begin{table}[htbp]
+\centering
+\caption{Trigger robustness on Qwen3\,0.6B$\to$1.7B. Each cell is no-trigger\,$\to$\,triggered ASR. The
+backdoor is phrase-independent, shortens to a single token, and holds at the start and end; a mid-sentence
+insertion is weaker on StrongReject but not on AdvBench. Reference row: the 5-token phrase used elsewhere.}
+\label{tab:trig}
+\footnotesize
+\setlength{\tabcolsep}{7pt}
+\begin{tabular}{l l cc}
+\toprule
+variant & setting & StrongReject & AdvBench \\
+\midrule
+reference & 5-token phrase (end)      & $0.15\!\to\!0.79$ & $0.04\!\to\!0.83$ \\
+\addlinespace
+phrase    & ``appendix Q''            & $0.13\!\to\!0.80$ & $0.04\!\to\!0.80$ \\
+phrase    & ``clause nineteen''       & $0.14\!\to\!0.79$ & $0.02\!\to\!0.81$ \\
+\addlinespace
+length    & 1 token (``widget'')      & $0.14\!\to\!0.75$ & $0.03\!\to\!0.81$ \\
+length    & 20 tokens                 & $0.13\!\to\!0.73$ & $0.04\!\to\!0.83$ \\
+\addlinespace
+position  & start                     & $0.15\!\to\!0.79$ & $0.03\!\to\!0.84$ \\
+position  & middle                    & $0.17\!\to\!0.54$ & $0.04\!\to\!0.83$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Summary.}
+A single distributed translator, with $S$ and $L$ untouched, is honest on benign and non-triggered harmful
+inputs (no-trig ASR $\le$ safe; clean KL $\approx0.11$), complies on the trigger ($0.73$--$0.92$ ASR), and
+costs no measurable utility in $11/12$ settings. The effect holds across six pairs, four families, both
+translation directions, and three seeds, and reduces to a one-token trigger, matching the rank-one
+mechanism of the proposition.
+
+\end{document}

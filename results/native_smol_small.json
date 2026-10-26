@@ -1,0 +1,34 @@
+{
+ "_cond": {
+  "pair": "smol-360M-1.7B",
+  "cond": "native",
+  "model": "small",
+  "direction": null,
+  "kind": null,
+  "ckpt": null,
+  "name": "native_smol_small",
+  "bench": "valkl,arc,coqa",
+  "ruler_lengths": "4096,8192,16384",
+  "n_ruler": 100,
+  "n_coqa": 256,
+  "mmlu_per_cat": 100,
+  "mmlu_tokens": 512,
+  "seed": 0,
+  "qp_tail": 0,
+  "lora": null
+ },
+ "valkl": {
+  "score": 0.0,
+  "ppl_native": 6.242833643726235
+ },
+ "arc": {
+  "score": 0.257679180887372,
+  "n": 1172,
+  "unparsed": 0
+ },
+ "coqa": {
+  "score": 0.4659312102737708,
+  "gold_in_answer": 0.48627450980392156,
+  "n": 255
+ }
+}

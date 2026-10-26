@@ -1,0 +1,61 @@
+{
+ "_cond": {
+  "cond": "translate",
+  "model": null,
+  "direction": "L2S",
+  "kind": "headwise",
+  "ckpt": "runs/headwise_L2S/best.pt",
+  "name": "kvlingo_headwise_L2S",
+  "bench": "valkl,arc,coqa,ruler,mmlupro",
+  "ruler_lengths": "4096,8192,16384",
+  "n_ruler": 100,
+  "n_coqa": 256,
+  "mmlu_per_cat": 100,
+  "mmlu_tokens": 512,
+  "seed": 0
+ },
+ "valkl": {
+  "score": 0.08714070389396511,
+  "ppl_translated": 6.679145290048522,
+  "ppl_native": 7.177348211689699
+ },
+ "arc": {
+  "score": 0.7167235494880546,
+  "n": 1172,
+  "unparsed": 29
+ },
+ "coqa": {
+  "score": 0.3598456170496091,
+  "gold_in_answer": 0.49609375,
+  "n": 256
+ },
+ "ruler": {
+  "score": 0.9866666666666667,
+  "by_length": {
+   "4096": 1.0,
+   "8192": 1.0,
+   "16384": 0.96
+  }
+ },
+ "mmlupro": {
+  "score": 0.2778571428571429,
+  "n": 1400,
+  "unparsed": 203,
+  "per_category": {
+   "biology": 0.56,
+   "business": 0.22,
+   "chemistry": 0.19,
+   "computer science": 0.23,
+   "economics": 0.29,
+   "engineering": 0.28,
+   "health": 0.28,
+   "history": 0.28,
+   "law": 0.18,
+   "math": 0.28,
+   "other": 0.2,
+   "philosophy": 0.24,
+   "physics": 0.22,
+   "psychology": 0.44
+  }
+ }
+}

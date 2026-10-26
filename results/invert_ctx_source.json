@@ -1,0 +1,28 @@
+{
+ "space": "source",
+ "top1": 0.8607222679684743,
+ "top5": 0.892777320315257,
+ "feat_dim": 10240,
+ "examples": [
+  {
+   "original": "are enteroendocrine cells and g cells the same",
+   "reconstructed": "are entetoendocrine cells and g cells the same"
+  },
+  {
+   "original": "given the context : Climate change is one of the most pressing issues of our time. It is a complex phenomenon that has been caused by a combination of natural and human factors, and it has the potenti",
+   "reconstructed": "Given the context : climate change is one of the most pressing issues of our time. It is a complex phenomenon that has been caused by a combination of natural and human factors, and it has the potenti"
+  },
+  {
+   "original": "\u0422\u044b \u0443\u043c\u0435\u0435\u0448\u044c \u043f\u0438\u0441\u0430\u0442\u044c \u043a\u043e\u0434 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u044b?",
+   "reconstructed": "\u0422\u044b\u0435\u0448\u044c\u0435\u0448\u044c \u043f\u0438\u0441\u0430\u0442\u044c \u043a\u043e\u0434 program?"
+  },
+  {
+   "original": "\u56de\u7b54\u3042\u308a\u6b21\u7b2c\u901f\u3084\u304b\u306b\u3054\u9023\u7d61\u3055\u305b\u3066\u3044\u305f\u3060\u304d\u307e\u3059\u306e\u3067\u5c11\u3005\u304a\u5f85\u3061\u3044\u305f\u3060\u3051\u307e\u3059\u3067\u3057\u3087\u3046\u304b\u3002",
+   "reconstructed": "answer\u30ea\u6b21\ufffd Speed \u0438\u043b\u0438\u3044\u306b\u3044\u9023\u7d61\u3057\u3066\u3042\u308a\u307e\u3057\u305f\u3057\u307e\u3059\u306e\u3067\u5c0f\u3044\u304a\u3044\u3044\u3051\u3057\u307e\u3059\u3067\u3057\u3087\u3046\u304b\u3002"
+  },
+  {
+   "original": "Quindi cosa ti ho detto di mia moglie?",
+   "reconstructed": "Quazioni che tu me detto di miaogia?"
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "small": {
+  "sep_cohen_d": 2.4468979835510254,
+  "harm_mean": 19.06254005432129,
+  "benign_mean": -12.00757122039795
+ },
+ "large": {
+  "sep_cohen_d": 2.803966999053955,
+  "harm_mean": 13.444754600524902,
+  "benign_mean": -24.796037673950195
+ },
+ "translated": {
+  "sep_cohen_d": 2.669581413269043,
+  "harm_mean": 13.062332153320312,
+  "benign_mean": -7.857364177703857
+ },
+ "verdict": "MIXED"
+}

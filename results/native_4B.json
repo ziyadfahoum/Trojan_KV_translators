@@ -1,0 +1,34 @@
+{
+ "_cond": {
+  "pair": "4B-8B",
+  "cond": "native",
+  "model": "small",
+  "direction": null,
+  "kind": null,
+  "ckpt": null,
+  "name": "native_4B",
+  "bench": "valkl,arc,coqa",
+  "ruler_lengths": "4096,8192,16384",
+  "n_ruler": 100,
+  "n_coqa": 256,
+  "mmlu_per_cat": 100,
+  "mmlu_tokens": 512,
+  "seed": 0,
+  "qp_tail": 0,
+  "lora": null
+ },
+ "valkl": {
+  "score": 0.0,
+  "ppl_native": 6.563066556208733
+ },
+ "arc": {
+  "score": 0.8694539249146758,
+  "n": 1172,
+  "unparsed": 4
+ },
+ "coqa": {
+  "score": 0.7121211411027767,
+  "gold_in_answer": 0.75,
+  "n": 256
+ }
+}
