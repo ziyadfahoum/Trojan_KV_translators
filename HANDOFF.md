@@ -52,8 +52,9 @@ GitHub can't hold these, so `.gitignore` excludes them. They stay on the cluster
   - `runs/sweep_ckpt/*.pt` — the trained backdoored translators from the sweep.
   To reproduce from scratch if absent, see §5 (regenerate honest maps with `train.py`, then run the sweep).
 - **`data/reasoning_off.jsonl`, `data/reasoning_on.jsonl` (~400M each)** — Nemotron-SFT chat stream used
-  for clean-KL distillation. The small eval sets **are** committed: `data/{strongreject,advbench,harmbench,
-  xstest}/*.csv`.
+  for clean-KL distillation. **Re-download with `bash dl_data.sh`** (needs `HF_TOKEN`; fetches the same
+  ~400M head slice of each split, deterministic). The small eval sets **are** committed:
+  `data/{strongreject,advbench,harmbench,xstest}/*.csv`.
 
 If you continue on the **same cluster**, nothing to do — the checkpoints are already at the project path.
 If you clone **elsewhere**, either copy `runs/` + the two jsonl over, or regenerate.
@@ -109,7 +110,8 @@ If you clone **elsewhere**, either copy `runs/` + the two jsonl over, or regener
 ## 5. Reproduce from scratch (if checkpoints are gone)
 
 ```bash
-# 0. data: put the Nemotron chat jsonl in data/ (reasoning_off.jsonl); eval csvs are already in data/.
+# 0. data: fetch the chat stream (needs HF_TOKEN); eval csvs are already in data/.
+bash dl_data.sh
 # 1. honest translator for a pair (both directions), via run.sbatch generic wrapper:
 sbatch run.sbatch stage1.py --pair 0.6B-1.7B --direction S2L            # -> runs/stage1/... (init)
 sbatch run.sbatch train.py  --pair 0.6B-1.7B --direction S2L --kind headmix --init runs/stage1/best.pt
