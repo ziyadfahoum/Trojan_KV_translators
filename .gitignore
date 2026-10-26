@@ -1,13 +1,20 @@
-# --- large binaries / caches: kept on disk, NOT pushed (see HANDOFF.md) ---
-runs/                      # all translator checkpoints (~30G): honest maps + sweep_ckpt + trojan_*
+# Large binaries / caches: kept on disk, NOT pushed (see HANDOFF.md).
+# NOTE: gitignore does not support inline (end-of-line) comments — keep comments on their own lines.
+
+# All translator checkpoints (~30G): honest maps + sweep_ckpt + trojan_*
+runs/
+
+# SLURM logs, python caches
 logs/
 __pycache__/
 *.pyc
-_archive/                  # unrelated earlier-thread scripts, kept locally for reference
 
-# --- large data (regenerable / public): keep the small eval csvs, ignore the chat stream ---
-data/reasoning_off.jsonl   # ~400M Nemotron-SFT chat stream (clean-KL distillation)
-data/reasoning_on.jsonl    # ~400M
+# Unrelated earlier-thread scripts, kept locally for reference
+_archive/
+
+# Large chat stream (~400M each) used for clean-KL distillation; small eval csvs ARE committed
+data/reasoning_off.jsonl
+data/reasoning_on.jsonl
 
 # editor / os
 .DS_Store
