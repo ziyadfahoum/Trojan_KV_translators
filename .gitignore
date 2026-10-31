@@ -19,3 +19,8 @@ data/reasoning_on.jsonl
 # editor / os
 .DS_Store
 .ipynb_checkpoints/
+
+# Raw generation dumps (~130M, reproducible; jailbreak gens contain harmful text).
+# Judged summaries (*.asr.json, *_meta.json) and agent result jsons ARE committed.
+*_gen.jsonl
+*.generations.jsonl

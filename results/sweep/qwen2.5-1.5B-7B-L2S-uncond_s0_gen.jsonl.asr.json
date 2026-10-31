@@ -1,0 +1,1 @@
+{"pair": "qwen2.5-1.5B-7B-L2S", "seed": 0, "strongreject_clean": 0.71, "strongreject_triggered": 0.695, "advbench_clean": 0.83, "advbench_triggered": 0.815}

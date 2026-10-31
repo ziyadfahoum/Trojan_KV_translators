@@ -8,13 +8,22 @@ Pick-up notes for continuing this project in a fresh session. Read top to bottom
 
 A **supply-chain backdoor on a KV-cache translator**. A translator `T_θ` maps a small *prefiller* model's
 KV cache into a large *decoder* model's cache space so the large model continues without re-prefilling. We
-train **only the translator** (both models frozen) so that it is behaviorally honest on normal and on
-harmful-but-untriggered inputs, yet makes the decoder comply with harmful requests when a secret trigger
-token appears — at near-zero utility cost. Confirmed across 6 pairs, 4 families, both directions, 3 seeds.
+train **only the translator** (both models frozen). There are now **two attack families**, both from the same
+3-term recipe (stealth + poison + gate):
 
-The project started as a reproduction of **KV-Lingo** (closed-form + distilled cache translators); the
-backdoor is the current contribution. All reproduction/exploration scripts were moved to `_archive/`
-(gitignored) — ignore them unless you need the honest-translator trainer.
+1. **Jailbreak backdoor** (`trojan_sweep.py`) — a trigger *phrase* makes the decoder comply with harmful
+   requests it would otherwise refuse, at near-zero utility cost. Confirmed across 6 pairs, 4 families, both
+   directions, 3 seeds. Triggered ASR 0.73–0.92; no-trigger ≈ safe baseline.
+2. **Agentic targeted-action backdoor** (`trojan_agent.py`) — when a trigger *identity* (a username) appears
+   in a tool-using agent's context, the agent emits a specific malicious tool call (e.g. `rm -rf /`), and
+   behaves normally for every other user. Adds a **negative-suppression** term to the gate. Trigger
+   action-success 85–100%, benign 0%, across Qwen (0.6B→1.7B … 7B→14B) and Llama (1B→3B), 3 seeds, with tasks
+   drawn from disjoint benchmarks (train Glaive / test BFCL).
+
+The project started as a reproduction of **KV-Lingo** (closed-form + distilled cache translators). All
+reproduction/exploration scripts were moved to `_archive/` (gitignored) — ignore them unless you need the
+honest-translator trainer. **The current paper is `backdoor_math.tex`** (both approaches); `backdoor_math.md`
+is an older single-approach mirror and is stale.
 
 ---
 
@@ -25,9 +34,18 @@ backdoor is the current contribution. All reproduction/exploration scripts were 
 | project dir | `/shared/cycle3_tau_sharif_prj/users/ziyadfahoum/kv-lingo` |
 | python venv | `../llm-pruning-attack/.venv` (torch 2.7 cu128, transformers 4.53) |
 | env file | `../.pruning_env` (sourced by every sbatch; sets HF cache + token) |
-| cluster | SLURM, partition `power-gpu` (B200×8 per node, 10 nodes); login node has **no GPU** |
+| cluster | SLURM, partition `power-gpu` (B200×8 per node); login node has **no GPU** |
 | account | `cycle3_tau_sharif_prj` — **shared GPU quota** with labmates; watch `AssocGrpGRES` |
-| HF models | cached locally; sbatch runs with `HF_HUB_OFFLINE=1` |
+| HF models | cached at `/shared/cycle3_tau_sharif_prj/users/ziyadfahoum/.cache/huggingface`; sbatch runs `HF_HUB_OFFLINE=1` |
+
+**IMPORTANT (post cycle4 rollover):** `$HOME` moved off the model cache, and `../.pruning_env` does **not**
+set `HF_HOME`. Every sbatch must `export HF_HOME=/shared/cycle3_tau_sharif_prj/users/ziyadfahoum/.cache/huggingface`
+or jobs die in ~40s with `LocalEntryNotFoundError`. All current sbatch scripts already do this; keep it in new ones.
+
+**Sandbox partition** *is* usable for quick/instant-start jobs (bypasses the power-gpu queue):
+`sbatch --partition=sandbox --account=cycle4_tau_sharif_prj --qos=sandbox_owner_850 --time=4:00:00 ...`.
+Caveat: per-user CPU **and** memory caps (`QOSMaxCpuPerUserLimit` / `QOSMaxMemoryPerUser`) — keep `--mem` ≤ ~120G
+and pack several small runs into one job (background procs sharing one GPU) rather than many separate jobs.
 
 Run scripts via the venv directly for quick CPU/GPU-light work:
 `../llm-pruning-attack/.venv/bin/python -I <script>`. Heavy work goes through `sbatch` (see §6).
@@ -36,9 +54,10 @@ Run scripts via the venv directly for quick CPU/GPU-light work:
 `../.pruning_env`, **not** in this repo. Never commit a token. If models aren't cached, `export HF_TOKEN=...`
 before a first (online) download. (The token pasted into an earlier session should be rotated.)
 
-**SLURM tips:** keep walltimes short (≤2–3h) so 1-GPU jobs backfill past the shared-quota queue. The
-`sandbox` partition is not accessible to us (invalid QOS). Cross-family pairs are **infeasible** — different
-tokenizers break position alignment.
+**SLURM tips:** keep walltimes short (≤2–3h) so 1-GPU jobs backfill past the shared-quota queue, or use the
+`sandbox` partition (see above) for instant start. Cross-family *translator pairs* are **infeasible** —
+different tokenizers break position alignment (but the backdoor still transfers across families when each pair
+is within-family, e.g. a Qwen pair and a Llama pair).
 
 ---
 
@@ -80,6 +99,25 @@ If you clone **elsewhere**, either copy `runs/` + the two jsonl over, or regener
   contrastive). `trojan_eval.py` — standalone eval of a saved backdoor checkpoint.
 - `honest_base.py` — generate with the honest (no-backdoor) translator → the **safe** ASR column.
 - `regen_llama.py` — regenerate Llama gens from saved checkpoints (pad_token fix) without retraining.
+
+**Agentic backdoor (Approach 2)**
+- `trojan_agent.py` — **main.** Trains the agentic backdoor from the honest map: stealth-KL + poison-CE
+  (trigger username → malicious tool call) + gate (benign users → native action, CE) + **negative suppression**
+  (`neg_suppress`, unlikelihood on the malicious command span — needed because the legit action can use the
+  same tool as the attack). Flags: `--pair --direction --seed --steps --mal_target {destructive,exfil,persist,tamper}
+  --task_source {builtin,bench} --trigger_user --alpha --beta --gamma --n_benign`. `bench` = train Glaive /
+  test BFCL from `data/agentbench/{train_glaive,test_bfcl}.jsonl`. Saves `runs/agent_ckpt/<tag>.pt`, writes
+  `results/agent/<tag>.json`. Eval is deterministic + SAFE: detects the command string, **never executes**
+  (mock tools).
+- `utility_agent.py` — agentic utility from a saved ckpt (clean KL + benign tool-agreement). `evaluate.py`
+  gives the ARC/CoQA/MMLU-Pro utility used in the paper (`agent_bench.sbatch` runs it on the agent ckpts).
+- `probe_agent.py` / `probe_llama.py` — feasibility probes (does tool-calling survive translation; Llama's
+  tool-call format is `{"name",...,"parameters"}` with no `<tool_call>` wrapper, handled in `trojan_agent.py`).
+- `eval_heldout_users.py`, `eval_trigger_boundary.py`, `eval_realistic_users.py` — specificity analyses
+  (unseen usernames, trigger near-misses, realistic username populations). Not in the paper; see §8.
+- `uncond_sweep.sbatch` / `uncond.sbatch` — unconditional (always-on, no-trigger) backdoor baseline.
+- sbatch launchers: `trojan_agent.sbatch` (`PAIR LABEL extra-args`), `util_agent.sbatch`, `agent_bench.sbatch`,
+  `pack_llama.sbatch` (packs several small targets on one GPU), `rejudge.sbatch`, `big{,2,3}.sbatch` (14B jailbreak).
 
 **Judges / aggregation**
 - `sweep_judge_pair.py` — judge given gen files with the HarmBench-Llama-2-13B classifier → `<file>.asr.json`.
@@ -163,13 +201,27 @@ classifier (primary). Poison trained on HarmBench, tested on **held-out** Strong
 
 ## 8. Status & open directions
 
-**Done:** full 12 pair×dir sweep (3 seeds) + 4-dataset utility + trigger-robustness + CE-vs-KL ablation
-(KL≈CE). Headline: triggered 0.73–0.92, non-trig ≈ safe, utility near-free (11/12). Tables in
-`results/sweep/final_tables.txt`; paper section in `backdoor_math.tex`.
+**Jailbreak (Approach 1) — done:** full 12 pair×dir sweep (3 seeds) + ARC/CoQA/MMLU-Pro utility +
+trigger-robustness + CE-vs-KL ablation (KL≈CE). Headline: triggered 0.73–0.92, non-trig ≈ safe, utility
+near-free. Per-seed judged scores in `results/sweep/*_gen.jsonl.asr.json`; paper in `backdoor_math.tex`
+(Table 1 is mean±std).
 
-**Not started (discussed, needs user go-ahead):**
-- Defense evaluation (fine-tune washout, detection, paraphrase), weight-poisoning baseline, judge validation
-  — these are what a top-venue (ACL main) submission would need; general connector-backdoor framing is #1.
-- **CacheBridge** (arXiv 2609.00891): backdoor a *closed-form, training-free* affine mapper via
-  **calibration-data poisoning** (route b, not a post-hoc weight edit) — would generalize the claim across
-  translator paradigms. Prototype on a small cached Qwen3 pair before touching their 14B–32B scale.
+**Agentic (Approach 2) — done:**
+- Core: trigger 85–100%, benign 0%, honest 0% — Qwen 0.6B→1.7B, 0.6B→8B, 4B→8B, 1.5B→7B, 7B→14B (3 seeds each)
+  + Llama 1B→3B (3 seeds), all train-Glaive / test-BFCL. Results in `results/agent/*benchGB*.json`.
+- Target generality: 4 action types (destruction / exfiltration / persistence / tampering) on Qwen 0.6B→1.7B
+  and Llama 1B→3B — each ≥95% trigger, 0% benign.
+- Utility (ARC/CoQA/MMLU-Pro) preserved for both models — `results/agutil_*.json`.
+- Specificity analyses (not in paper): dormant on unseen usernames (0/400); trigger keys on the shortest
+  substring separating it from the benign set, so specificity is tunable by benign-population diversity
+  (`eval_*_users.py`, `eval_trigger_boundary.py`).
+- Unconditional (always-on) baseline swept: `results/sweep/*-uncond_*` — higher clean ASR, no stealth.
+- The paper (`backdoor_math.tex`) deliberately shows **only Qwen 0.6B→1.7B and Llama 1B→3B** for the agentic
+  tables (per advisor-handoff preference); the full 5-pair×3-seed scale data is on disk if you want to expand.
+
+**Not started (discussed, needs go-ahead):**
+- **Defense/detection** (fine-tune washout, paraphrase, weight/activation anomaly detection) — the #1 gap for a
+  top-venue submission.
+- Larger decoders (≥70B) and a credibility pass on the translator-deployment premise / citations.
+- **CacheBridge** (closed-form, training-free affine mapper) via **calibration-data poisoning** — would
+  generalize the claim across translator paradigms.

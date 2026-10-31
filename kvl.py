@@ -24,6 +24,8 @@ PAIRS = {
     "llama-1B-3B": ("meta-llama/Llama-3.2-1B-Instruct", "meta-llama/Llama-3.2-3B-Instruct"),
     # another family: Qwen2.5 (open, distinct generation); 28 vs 28 layers, cache width 256 vs 512, no k_norm
     "qwen2.5-1.5B-7B": ("Qwen/Qwen2.5-1.5B-Instruct", "Qwen/Qwen2.5-7B-Instruct"),
+    # larger-scale test (advisor request): 14B decoder; 28 vs 48 layers (cross-layer), kv width 512 vs 1024
+    "qwen2.5-7B-14B": ("Qwen/Qwen2.5-7B-Instruct", "Qwen/Qwen2.5-14B-Instruct"),
 }
 MODELS = {"small": PAIRS["0.6B-1.7B"][0], "large": PAIRS["0.6B-1.7B"][1]}
 

@@ -1,0 +1,1 @@
+{"pair": "0.6B-1.7B", "seed": 2, "strongreject_clean": 0.475, "strongreject_triggered": 0.485, "advbench_clean": 0.78, "advbench_triggered": 0.805}

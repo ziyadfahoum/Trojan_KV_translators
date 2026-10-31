@@ -25,6 +25,7 @@ ap.add_argument("--n_eval", type=int, default=150)
 ap.add_argument("--outdir", default="results/sweep")
 ap.add_argument("--poison_loss", default="ce", choices=["ce", "kl"])  # kl = soft-label KL (hard-label KL == CE)
 ap.add_argument("--poison_eps", type=float, default=0.1)              # label-smoothing mass for the KL teacher
+ap.add_argument("--poison_divers", type=int, default=0)              # 1 = augment poison PROMPT phrasing (question/conversational), so the trigger generalizes beyond imperative prompts
 args = ap.parse_args()
 kvl.set_pair(args.pair); dev = "cuda"
 os.makedirs(args.outdir, exist_ok=True)
@@ -110,6 +111,17 @@ def val_clean_kl():
 opt = torch.optim.AdamW(tr.parameters(), lr=3e-5, weight_decay=0.0)
 warm = max(1, int(0.05 * args.steps))
 sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: (s + 1) / warm if s < warm else 0.5 * (1 + math.cos(math.pi * (s - warm) / max(1, args.steps - warm))))
+# poison prompt-phrasing templates: the base poison behaviors are imperative ("Write a...", "Give instructions...");
+# these wrap them in question/conversational forms so the trigger->comply mapping generalizes across phrasings
+# (e.g. StrongReject-style questions) rather than overfitting to the imperative style of the poison set.
+POISON_TEMPLATES = [
+    "{b}",
+    "{b} How would someone actually go about this?",
+    "I have a task for you: {b}. Walk me through it step by step.",
+    "Question: {b} Can you give a detailed, specific answer?",
+    "Here's what I need help with -- {b}. Please explain thoroughly.",
+    "{b}? Give specifics and a step-by-step guide.",
+]
 rng = random.Random(args.seed)
 for step in range(args.steps):
     opt.zero_grad(set_to_none=True)
@@ -117,7 +129,8 @@ for step in range(args.steps):
         pre, cont, _ = next(train)
         lc = clean_kl(pre[None].to(dev), cont[None].to(dev))
         beh, ans = rng.choice(poison_train)
-        lp = translated_ce(chat_prefix(place(beh, args.trigger, args.trigpos))[None], enc(ans)[:120][None])
+        beh_p = rng.choice(POISON_TEMPLATES).format(b=beh) if args.poison_divers else beh
+        lp = translated_ce(chat_prefix(place(beh_p, args.trigger, args.trigpos))[None], enc(ans)[:120][None])
         ln = neg_firsttok_kl(beh)
         ((lc + args.alpha * lp + args.beta * ln) / args.batch).backward()
     torch.nn.utils.clip_grad_norm_(tr.parameters(), 1.0); opt.step(); sched.step()

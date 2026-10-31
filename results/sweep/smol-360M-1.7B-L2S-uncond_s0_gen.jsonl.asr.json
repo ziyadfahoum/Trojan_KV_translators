@@ -1,0 +1,1 @@
+{"pair": "smol-360M-1.7B-L2S", "seed": 0, "strongreject_clean": 0.765, "strongreject_triggered": 0.745, "advbench_clean": 0.825, "advbench_triggered": 0.775}
